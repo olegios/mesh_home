@@ -2,6 +2,8 @@
 #include <ArduinoOTA.h>
 #include <WiFi.h>
 
+#include <WiFiClient.h>
+#include <BlynkSimpleEsp32.h>
 
 // #include "painlessMesh.h"
 #include "credentials.hpp"
@@ -10,8 +12,15 @@
 #define ATOMIC_FS_UPDATE
 
 
+// #define BLYNK_PRINT        Serial
+#define B_TEMRMINAL        V0
+
+
 static void init_wifi(void);
 static void init_ota(void);
+static void init_blynk(void);
+
+static WidgetTerminal blynk_terminal(B_TEMRMINAL);
 
 
 void setup() {
@@ -20,11 +29,13 @@ void setup() {
 
   init_wifi();
   init_ota();
+  init_blynk();
 }
 
 
 void loop() {
   ArduinoOTA.handle();
+  Blynk.run();
 }
 
 
@@ -47,7 +58,7 @@ static void init_wifi(void) {
 
 
 static void init_ota(void) {
-  Serial.print("\nOTA init");
+  Serial.println("\nOTA init");
   // Port defaults to 3232
   // ArduinoOTA.setPort(3232);
 
@@ -89,4 +100,12 @@ static void init_ota(void) {
 
   ArduinoOTA.begin();
   Serial.printf("OTA Ready, free space available: %.f bytes\n",(float)ESP.getFreeSketchSpace());
+}
+
+
+static void init_blynk(void) {
+  Serial.println("\nBlynk init");
+  Blynk.begin(BLYNK_TOKEN, WIFI_SSID, WIFI_PASS);
+  blynk_terminal.println(F("Init successful"));
+  blynk_terminal.flush();
 }
