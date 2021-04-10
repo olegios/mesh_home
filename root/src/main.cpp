@@ -1,26 +1,29 @@
 #include <Arduino.h>
 #include <ArduinoOTA.h>
 #include <WiFi.h>
-
 #include <WiFiClient.h>
 #include <BlynkSimpleEsp32.h>
+#include <painlessMesh.h>
 
-// #include "painlessMesh.h"
 #include "credentials.hpp"
 
 // https://arduino-esp8266.readthedocs.io/en/latest/ota_updates/readme.html#compression
 #define ATOMIC_FS_UPDATE
 
 
+#define DEBUG true // flag to turn on/off debugging
+#define Serial if(DEBUG)Serial
+
+
 // #define BLYNK_PRINT        Serial
-#define B_TEMRMINAL        V0
+// #define B_TEMRMINAL        V0
 
 
 static void init_wifi(void);
 static void init_ota(void);
 static void init_blynk(void);
 
-static WidgetTerminal blynk_terminal(B_TEMRMINAL);
+// static WidgetTerminal blynk_terminal(B_TEMRMINAL);
 
 
 void setup() {
@@ -49,7 +52,7 @@ static void init_wifi(void) {
     Serial.print('.');
   }
 
-  Serial.println("Connection established");
+  Serial.println("\nConnection established");
   Serial.print("IP:\t");
   Serial.println(WiFi.localIP());
   Serial.print("RSSI:\t");
@@ -91,11 +94,17 @@ static void init_ota(void) {
     })
     .onError([](ota_error_t error) {
       Serial.printf("Error[%u]: ", error);
-      if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
-      else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
-      else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
-      else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
-      else if (error == OTA_END_ERROR) Serial.println("End Failed");
+      if (error == OTA_AUTH_ERROR) {
+        Serial.println("Auth Failed");
+      } else if (error == OTA_BEGIN_ERROR) {
+        Serial.println("Begin Failed");
+      } else if (error == OTA_CONNECT_ERROR) {
+        Serial.println("Connect Failed");
+      } else if (error == OTA_RECEIVE_ERROR) {
+        Serial.println("Receive Failed");
+      } else if (error == OTA_END_ERROR) {
+        Serial.println("End Failed");
+      }
     });
 
   ArduinoOTA.begin();
@@ -104,8 +113,8 @@ static void init_ota(void) {
 
 
 static void init_blynk(void) {
-  Serial.println("\nBlynk init");
   Blynk.begin(BLYNK_TOKEN, WIFI_SSID, WIFI_PASS);
-  blynk_terminal.println(F("Init successful"));
-  blynk_terminal.flush();
+  Serial.println("\nBlynk init successful");
+  // blynk_terminal.println(F("Init successful"));
+  // blynk_terminal.flush();
 }
